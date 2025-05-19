@@ -6,24 +6,25 @@ import {
     Hatterzene,
     Hangeffekt,
     Oldal,
-} from "./base.js";
+} from "../base.js";
 
-var masodik = new Oldal(
+new Oldal(
     "masodik",
     "2.webp",
     new Fejlec("Üdvözöljük! Ez a második oldal!"),
     new Leiras("Itt található a második oldal, ahol további információkat találhat."),
     [
         new Gomb("Vissza az első oldalra", "kezdo", new GombSzin("red", "rgb(77, 0, 150)")),
-        new Gomb("Tovább a harmadik oldalra", "harmadik", new GombSzin("green", "white")),
+        new Gomb("Tovább a harmadik oldalra", "harmadik", new GombSzin("green", "black")),
+        new Gomb("Ez a gomb sem csinál semmit", ""),
     ],
-    new Hatterzene("Folytat"),
+    new Hatterzene("Folytat"),  
     [
         new Hangeffekt("bark.wav"),
     ]
 );
 
-var harmadik = new Oldal(
+new Oldal(
     "harmadik",
     "3.png",
     new Fejlec("Üdvözöljük! Ez a harmadik oldal!"),
