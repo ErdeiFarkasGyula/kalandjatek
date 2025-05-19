@@ -1,63 +1,181 @@
-const tarto = document.getElementById("tarto");
+//- KONFIG -
+const kepMappa  = "képek/";
+const hatterzeneMappa  = "háttérzenék/";
+const hatterzeneKezeloAlpha = 0.2;
+const hangeffektekMappa  = "hangeffektek/";
 
-function oldalBetoltes(oldal) {
-    tarto.innerHTML = oldal[0];
-    tarto.style.backgroundImage = oldal[1]
-}
+//- SETUP -
+const tarto = document.createElement("div");
+tarto.id = "tarto";
 
-function gomb(szoveg, link) {
+const hatterzeneKezelo = document.createElement("audio");
+hatterzeneKezelo.style.opacity = hatterzeneKezeloAlpha;
+hatterzeneKezelo.setAttribute("controls", "controls");
+hatterzeneKezelo.setAttribute("autoplay", "autoplay");
+hatterzeneKezelo.setAttribute("loop", "loop");
+
+document.body.appendChild(tarto);
+document.body.appendChild(hatterzeneKezelo);
+
+//- VÁLTOZÓK -
+var oldalMentes;
+var hatterzeneMentes;
+
+//- FUNKCIÓK - 
+//Fejléc
+function Fejlec(szoveg, szin = "white") {
     this.szoveg = szoveg;
-    this.link = link;
+    this.szin = szin;
 }
 
-function oldal(hatter, fejlec, leiras, gomb1, gomb2) {
+//Leírás
+function Leiras(szoveg, szin = "white") {
+    this.szoveg = szoveg;
+    this.szin = szin;
+}
+
+//Gomb
+function GombSzin(hatterSzin, szovegSzin) {
+    this.hatterSzin = hatterSzin;
+    this.szovegSzin = szovegSzin;
+}
+
+function Gomb(szoveg, oldal, gombSzin = new GombSzin("blue", "white")) {
+    this.szoveg = szoveg;
+    this.oldal = oldal;
+    this.gombSzin = gombSzin;
+}
+
+//Háttérzene
+function Hatterzene(cim, kezdes = "00:00") {
+    this.cim = cim;
+    this.kezdes = kezdes;
+}
+
+//Hangeffekt
+function Hangeffekt(cim, kezdes = "00:00") {
+    this.cim = cim;
+    this.kezdes = kezdes;
+}
+
+//Oldal
+function Oldal(hatter, fejlec, leiras, gombok, hatterzene, hangeffektek = null) {
     this.hatter = hatter;
     this.fejlec = fejlec;
     this.leiras = leiras;
-    this.gomb1 = gomb1;
-    this.gomb2 = gomb2;
+    this.gombok = gombok;
+    this.hatterzene = hatterzene;
+    this.hangeffektek = hangeffektek;
 
-    var szoveg = `
-        <div class="fejlec">
-            <h1>${fejlec}</h1>
+    var kimenet = `
+        <div class="fejlec" style="color: ${fejlec.szin};">
+            <h1>${fejlec.szoveg}</h1>
         </div>
-        <div class="leiras">
-            <p>${leiras}</p>
+        <div class="leiras" style="color: ${leiras.szin};">
+            <h2>${leiras.szoveg}</h2>
         </div>
+
         <div class="gombok">
-            <a onclick="oldalBetoltes(${gomb1.link});" class="gomb">${gomb1.szoveg}</a>
-            <a onclick="oldalBetoltes(${gomb2.link});" class="gomb">${gomb2.szoveg}</a>
-        </div>
     `;
 
-    var hatter = `url(images/${hatter})`;
+    //Gombok generálása
+    for (let i = 0; i < gombok.length; i++) {
+        var gomb = gombok[i];
+        kimenet += `
+            <a onclick="OldalBetoltes(${gomb.oldal});" class="gomb" style="background-color: ${gomb.gombSzin.hatterSzin}; color: ${gomb.gombSzin.szovegSzin};">${gomb.szoveg}</a>
+        `;
+    }
+    kimenet += `</div><p class="alsoMargin"></p>`;
+
+    var hatter = `url(${kepMappa}${hatter})`;
     tarto.style.backgroundImage = hatter;
 
-    return [szoveg, hatter];
+    return [kimenet, hatter, hatterzene, hangeffektek];
 }
 
-let kezdo = oldal(
+
+//- OLDALAK -
+let kezdo = new Oldal(
     "1.png",
-    "Üdvözöljük az első oldalon!",
-    "Itt található a tárgyaló szobája, ahol különböző feladatokat végezhet el.",
-    new gomb("Ez nem csinál semmit", "kezdo"),
-    new gomb("Tovább a második oldalra", "masodik"),
+    new Fejlec("Kezd el a kalandozást!", "yellow"),
+    new Leiras("Kezd el a kalandot a bal gombra kattintva!", "pink"),
+    [ 
+        new Gomb("Tovább a második oldalra", "masodik", new GombSzin("green", "white")),
+        new Gomb("Ez amúgy nem csinál semmit", "", new GombSzin("red", "black")),
+    ],
+    new Hatterzene("Jamiroquai_FeelsJustLikeItShould.mp3", "00:15"),
+    []
 );
 
-let masodik = oldal(
+let masodik = new Oldal(
     "2.webp",
-    "Üdvözöljük! Ez a második oldal!",
-    "Itt található a második oldal, ahol további információkat találhat.",
-    new gomb("Vissza az első oldalra", "kezdo"),
-    new gomb("Tovább a harmadik oldalra", "harmadik"),
+    new Fejlec("Üdvözöljük! Ez a második oldal!"),
+    new Leiras("Itt található a második oldal, ahol további információkat találhat."),
+    [
+        new Gomb("Vissza az első oldalra", "kezdo"),
+        new Gomb("Tovább a harmadik oldalra", "harmadik"),
+    ],
+    new Hatterzene("Folytat"),
+    [
+        new Hangeffekt("bark.wav"),
+    ]
 );
 
-let harmadik = oldal(
+let harmadik = new Oldal(
     "3.png",
-    "Üdvözöljük! Ez a harmadik oldal!",
-    "Itt található a harmadik oldal, de innen már nincs tovább!",
-    new gomb("Vissza az első oldalra", "kezdo"),
-    new gomb("Vissza a második oldalra", "masodik"),
+    new Fejlec("Üdvözöljük! Ez a harmadik oldal!"),
+    new Leiras("Itt található a harmadik oldal, de innen már nincs tovább!"),
+    [
+        new Gomb("Vissza az első oldalra", "kezdo"),
+        new Gomb("Vissza a második oldalra", "masodik"),
+    ],
+    new Hatterzene(null),
+    [
+        new Hangeffekt("over.wav"),
+        new Hangeffekt("whistle.wav"),
+    ]
 );
 
-oldalBetoltes(kezdo)
+oldalMentes = kezdo;
+hatterzeneMentes = new Hatterzene("KEZDÉS", "00:00");
+
+//- OLDAL BETÖLTÉSE -
+function OldalBetoltes(oldal) {
+    var szoveg = oldal[0];
+    var hatter = oldal[1];
+    var hatterzene = oldal[2];
+    var hangeffektek = oldal[3];
+
+    console.log("Háttérzene:", hatterzene, "Mentés:", hatterzeneMentes);
+    if (hatterzene.cim != "Folytat" && hatterzene.cim != hatterzeneMentes.cim) {
+        if (hatterzene.cim == null) {
+            hatterzeneKezelo.src = "";
+        } else {
+            hatterzeneKezelo.src = hatterzeneMappa + hatterzene.cim + "#t=" + hatterzene.kezdes;
+        }
+    }
+    if (hatterzeneMentes.cim == "")
+
+    hatterzeneKezelo.play();
+    if (hatterzene.cim != "Folytat") {
+        hatterzeneMentes = hatterzene;
+    }
+
+    if (tarto.innerHTML != szoveg || tarto.style.backgroundImage != hatter) {
+        oldalMentes = oldal;
+        tarto.innerHTML = szoveg;
+        tarto.style.backgroundImage = hatter;
+
+        for (let i = 0; i < hangeffektek.length; i++) {
+            var hangeffekt = hangeffektek[i];
+            var audio = document.createElement("audio");
+            audio.src = hangeffektekMappa + hangeffekt.cim + "#t=" + hangeffekt.kezdes;
+            audio.setAttribute("autoplay", "autoplay");
+            audio.play();
+        }
+    }
+}
+
+
+//- FUTÁS -
+OldalBetoltes(kezdo)
