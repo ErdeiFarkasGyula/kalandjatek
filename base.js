@@ -18,48 +18,50 @@ document.body.appendChild(tarto);
 document.body.appendChild(hatterzeneKezelo);
 
 //- VÁLTOZÓK -
+export var oldalak = [];
 var oldalMentes;
 var hatterzeneMentes;
 
 //- FUNKCIÓK - 
 //Fejléc
-function Fejlec(szoveg, szin = "white") {
+export function Fejlec(szoveg, szin = "white") {
     this.szoveg = szoveg;
     this.szin = szin;
 }
 
 //Leírás
-function Leiras(szoveg, szin = "white") {
+export function Leiras(szoveg, szin = "white") {
     this.szoveg = szoveg;
     this.szin = szin;
 }
 
 //Gomb
-function GombSzin(hatterSzin, szovegSzin) {
+export function GombSzin(hatterSzin, szovegSzin) {
     this.hatterSzin = hatterSzin;
     this.szovegSzin = szovegSzin;
 }
 
-function Gomb(szoveg, oldal, gombSzin = new GombSzin("blue", "white")) {
+export function Gomb(szoveg, oldal, gombSzin = new GombSzin("blue", "white")) {
     this.szoveg = szoveg;
     this.oldal = oldal;
     this.gombSzin = gombSzin;
 }
 
 //Háttérzene
-function Hatterzene(cim, kezdes = "00:00") {
+export function Hatterzene(cim, kezdes = "00:00") {
     this.cim = cim;
     this.kezdes = kezdes;
 }
 
 //Hangeffekt
-function Hangeffekt(cim, kezdes = "00:00") {
+export function Hangeffekt(cim, kezdes = "00:00") {
     this.cim = cim;
     this.kezdes = kezdes;
 }
 
 //Oldal
-function Oldal(hatter, fejlec, leiras, gombok, hatterzene, hangeffektek = null) {
+export function Oldal(cim, hatter, fejlec, leiras, gombok, hatterzene, hangeffektek = null) {
+    this.cim = cim;
     this.hatter = hatter;
     this.fejlec = fejlec;
     this.leiras = leiras;
@@ -82,20 +84,27 @@ function Oldal(hatter, fejlec, leiras, gombok, hatterzene, hangeffektek = null) 
     for (let i = 0; i < gombok.length; i++) {
         var gomb = gombok[i];
         kimenet += `
-            <a onclick="OldalBetoltes(${gomb.oldal});" class="gomb" style="background-color: ${gomb.gombSzin.hatterSzin}; color: ${gomb.gombSzin.szovegSzin};">${gomb.szoveg}</a>
+            <a onclick="OldalBetoltes('${gomb.oldal}');" class="gomb" style="background-color: ${gomb.gombSzin.hatterSzin}; color: ${gomb.gombSzin.szovegSzin};">${gomb.szoveg}</a>
         `;
     }
     kimenet += `</div><p class="alsoMargin"></p>`;
+    this.kimenet = kimenet;
+    this.hatter = `url(${kepMappa}${hatter})`;
 
-    var hatter = `url(${kepMappa}${hatter})`;
-    tarto.style.backgroundImage = hatter;
-
-    return [kimenet, hatter, hatterzene, hangeffektek];
+    oldalak.push(this);
 }
 
+export function OldalKereses(oldalBe) {
+    if (typeof oldalBe !== "string") {
+        oldalBe = oldalBe.cim;
+    }
+    var oldal = oldalak.find(oldal => oldal.cim == oldalBe);
+    return oldal;
+}
 
 //- OLDALAK -
 let kezdo = new Oldal(
+    "kezdo",
     "1.png",
     new Fejlec("Kezd el a kalandozást!", "yellow"),
     new Leiras("Kezd el a kalandot a bal gombra kattintva!", "pink"),
@@ -107,46 +116,22 @@ let kezdo = new Oldal(
     []
 );
 
-let masodik = new Oldal(
-    "2.webp",
-    new Fejlec("Üdvözöljük! Ez a második oldal!"),
-    new Leiras("Itt található a második oldal, ahol további információkat találhat."),
-    [
-        new Gomb("Vissza az első oldalra", "kezdo"),
-        new Gomb("Tovább a harmadik oldalra", "harmadik"),
-    ],
-    new Hatterzene("Folytat"),
-    [
-        new Hangeffekt("bark.wav"),
-    ]
-);
-
-let harmadik = new Oldal(
-    "3.png",
-    new Fejlec("Üdvözöljük! Ez a harmadik oldal!"),
-    new Leiras("Itt található a harmadik oldal, de innen már nincs tovább!"),
-    [
-        new Gomb("Vissza az első oldalra", "kezdo"),
-        new Gomb("Vissza a második oldalra", "masodik"),
-    ],
-    new Hatterzene(null),
-    [
-        new Hangeffekt("over.wav"),
-        new Hangeffekt("whistle.wav"),
-    ]
-);
-
 oldalMentes = kezdo;
 hatterzeneMentes = new Hatterzene("KEZDÉS", "00:00");
 
 //- OLDAL BETÖLTÉSE -
-function OldalBetoltes(oldal) {
-    var szoveg = oldal[0];
-    var hatter = oldal[1];
-    var hatterzene = oldal[2];
-    var hangeffektek = oldal[3];
+export function OldalBetoltes(oldalBe) {
+    if (oldalBe == "" || oldalBe == null) {
+        return;
+    }
 
-    console.log("Háttérzene:", hatterzene, "Mentés:", hatterzeneMentes);
+    var oldal = OldalKereses(oldalBe);
+
+    var szoveg = oldal.kimenet;
+    var hatter = oldal.hatter;
+    var hatterzene = oldal.hatterzene;
+    var hangeffektek = oldal.hangeffektek;
+
     if (hatterzene.cim != "Folytat" && hatterzene.cim != hatterzeneMentes.cim) {
         if (hatterzene.cim == null) {
             hatterzeneKezelo.src = "";
@@ -154,12 +139,12 @@ function OldalBetoltes(oldal) {
             hatterzeneKezelo.src = hatterzeneMappa + hatterzene.cim + "#t=" + hatterzene.kezdes;
         }
     }
-    if (hatterzeneMentes.cim == "")
 
-    hatterzeneKezelo.play();
     if (hatterzene.cim != "Folytat") {
         hatterzeneMentes = hatterzene;
     }
+    
+    hatterzeneKezelo.play();
 
     if (tarto.innerHTML != szoveg || tarto.style.backgroundImage != hatter) {
         oldalMentes = oldal;
@@ -176,6 +161,7 @@ function OldalBetoltes(oldal) {
     }
 }
 
+window.OldalBetoltes = OldalBetoltes;
 
 //- FUTÁS -
-OldalBetoltes(kezdo)
+OldalBetoltes(kezdo);
