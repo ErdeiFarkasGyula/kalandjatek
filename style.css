@@ -1,0 +1,34 @@
+body {
+    margin: 0;
+}
+
+.gomb {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    background-color: #45a049;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 130%;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.gomb:hover {
+    background-color: #45a049; /* Darker green */
+}
+
+#tarto {
+    color: white;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 150%;
+    box-shadow: inset 0 0 9000px rgb(0, 0, 0);
+}
