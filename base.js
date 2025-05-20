@@ -1,8 +1,8 @@
 //- KONFIG -
-const kepMappa  = "képek/";
-const hatterzeneMappa  = "háttérzenék/";
+const kepMappa = "kepek/";
+const hatterzeneMappa = "hatterzenek/";
 const hatterzeneKezeloAlpha = 0.2;
-const hangeffektekMappa  = "hangeffektek/";
+const hangeffektekMappa = "hangeffektek/";
 
 //- SETUP -
 const tarto = document.createElement("div");
@@ -108,7 +108,7 @@ let kezdo = new Oldal(
     "1.png",
     new Fejlec("Kezd el a kalandozást!", "yellow"),
     new Leiras("Kezd el a kalandot a bal gombra kattintva!", "pink"),
-    [ 
+    [
         new Gomb("Tovább a második oldalra", "masodik", new GombSzin("green", "white")),
         new Gomb("Ez amúgy nem csinál semmit", "", new GombSzin("red", "black")),
     ],
@@ -143,7 +143,7 @@ export function OldalBetoltes(oldalBe) {
     if (hatterzene.cim != "Folytat") {
         hatterzeneMentes = hatterzene;
     }
-    
+
     hatterzeneKezelo.play();
 
     if (tarto.innerHTML != szoveg || tarto.style.backgroundImage != hatter) {
