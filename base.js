@@ -1,4 +1,6 @@
 //- KONFIG -
+const hangKikapcs = false;
+
 const kepMappa = "kepek/";
 const hatterzeneMappa = "hatterzenek/";
 const hatterzeneKezeloAlpha = 0.2;
@@ -15,7 +17,9 @@ hatterzeneKezelo.setAttribute("autoplay", "autoplay");
 hatterzeneKezelo.setAttribute("loop", "loop");
 
 document.body.appendChild(tarto);
-document.body.appendChild(hatterzeneKezelo);
+if (!hangKikapcs) {
+    document.body.appendChild(hatterzeneKezelo);
+}
 
 //- VÁLTOZÓK -
 export var oldalak = [];
@@ -60,7 +64,7 @@ export function Hangeffekt(cim, kezdes = "00:00") {
 }
 
 //Oldal
-export function Oldal(cim, hatter, fejlec, leiras, gombok, hatterzene, hangeffektek = null) {
+export function Oldal(cim, hatter, fejlec, leiras, gombok, hatterzene = new Hatterzene("-"), hangeffektek = new Hangeffekt("-")) {
     this.cim = cim;
     this.hatter = hatter;
     this.fejlec = fejlec;
@@ -102,6 +106,53 @@ export function OldalKereses(oldalBe) {
     return oldal;
 }
 
+//- OLDAL BETÖLTÉSE -
+export function OldalBetoltes(oldalBe) {
+    if (oldalBe == "" || oldalBe == null) {
+        return;
+    }
+
+    var oldal = OldalKereses(oldalBe);
+
+    var szoveg = oldal.kimenet;
+    var hatter = oldal.hatter;
+
+    if (!hangKikapcs) {
+        var hatterzene = oldal.hatterzene;
+        var hangeffektek = oldal.hangeffektek;
+    
+        if (hatterzene.cim != "Folytat" && hatterzene.cim != hatterzeneMentes.cim) {
+            if (hatterzene.cim == null) {
+                hatterzeneKezelo.src = "";
+            } else {
+                hatterzeneKezelo.src = hatterzeneMappa + hatterzene.cim + "#t=" + hatterzene.kezdes;
+            }
+        }
+    
+        if (hatterzene.cim != "Folytat") {
+            hatterzeneMentes = hatterzene;
+        }
+    
+        hatterzeneKezelo.play();
+    } 
+
+    if (tarto.innerHTML != szoveg || tarto.style.backgroundImage != hatter) {
+        oldalMentes = oldal;
+        tarto.innerHTML = szoveg;
+        tarto.style.backgroundImage = hatter;
+
+        if (!hangKikapcs) {
+            for (let i = 0; i < hangeffektek.length; i++) {
+                var hangeffekt = hangeffektek[i];
+                var audio = document.createElement("audio");
+                audio.src = hangeffektekMappa + hangeffekt.cim + "#t=" + hangeffekt.kezdes;
+                audio.setAttribute("autoplay", "autoplay");
+                audio.play();
+            }
+        }
+    }
+}
+
 //- OLDALAK -
 
 // //TEMPLATE
@@ -129,55 +180,11 @@ let kezdo = new Oldal(
     [
         new Gomb("Tovább a második oldalra", "masodik", new GombSzin("green", "white")),
         new Gomb("Ez amúgy nem csinál semmit", "", new GombSzin("red", "black")),
-    ],
-    new Hatterzene("Jamiroquai_FeelsJustLikeItShould.mp3", "00:15"),
-    []
+    ]
 );
 
 oldalMentes = kezdo;
 hatterzeneMentes = new Hatterzene("KEZDÉS", "00:00");
-
-//- OLDAL BETÖLTÉSE -
-export function OldalBetoltes(oldalBe) {
-    if (oldalBe == "" || oldalBe == null) {
-        return;
-    }
-
-    var oldal = OldalKereses(oldalBe);
-
-    var szoveg = oldal.kimenet;
-    var hatter = oldal.hatter;
-    var hatterzene = oldal.hatterzene;
-    var hangeffektek = oldal.hangeffektek;
-
-    if (hatterzene.cim != "Folytat" && hatterzene.cim != hatterzeneMentes.cim) {
-        if (hatterzene.cim == null) {
-            hatterzeneKezelo.src = "";
-        } else {
-            hatterzeneKezelo.src = hatterzeneMappa + hatterzene.cim + "#t=" + hatterzene.kezdes;
-        }
-    }
-
-    if (hatterzene.cim != "Folytat") {
-        hatterzeneMentes = hatterzene;
-    }
-
-    hatterzeneKezelo.play();
-
-    if (tarto.innerHTML != szoveg || tarto.style.backgroundImage != hatter) {
-        oldalMentes = oldal;
-        tarto.innerHTML = szoveg;
-        tarto.style.backgroundImage = hatter;
-
-        for (let i = 0; i < hangeffektek.length; i++) {
-            var hangeffekt = hangeffektek[i];
-            var audio = document.createElement("audio");
-            audio.src = hangeffektekMappa + hangeffekt.cim + "#t=" + hangeffekt.kezdes;
-            audio.setAttribute("autoplay", "autoplay");
-            audio.play();
-        }
-    }
-}
 
 window.OldalBetoltes = OldalBetoltes;
 
