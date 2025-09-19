@@ -103,6 +103,24 @@ export function OldalKereses(oldalBe) {
 }
 
 //- OLDALAK -
+
+// //TEMPLATE
+// new Oldal(
+//     "cím",
+//     "kép.formátum",
+//     new Fejlec("Fejléc szöveg", "szín"),
+//     new Leiras("Leírás szöveg", "szín"),
+//     [
+//         new Gomb("Gomb szöveg", "oldal", new GombSzin("hatterSzin", "szovegSzin")),
+//         new Gomb("Gomb szöveg", "oldal"),
+//     ],
+//     new Hatterzene("cím", "kezdes"),
+//     [
+//         new Hangeffekt("cím"),
+//         new Hangeffekt("cím", "kezdes"),
+//     ]
+// );
+
 let kezdo = new Oldal(
     "kezdo",
     "1.png",
